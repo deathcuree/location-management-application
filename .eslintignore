@@ -1,0 +1,5 @@
+# Ignore Tailwind and other CSS so ESLint doesn't parse @tailwind directives
+client/**/*.css
+# Ignore build outputs
+client/dist
+dist
