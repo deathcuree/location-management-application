@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 
 import authRoutes from './routes/auth';
 import locationRoutes from './routes/locations';
+import uploadRoutes from './routes/upload';
 
 // Load environment variables
 dotenv.config();
@@ -20,8 +21,9 @@ app.get('/', (_req, res) => {
 });
 
 // Routes
-app.use('/auth', authRoutes);
-app.use('/locations', locationRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/locations', locationRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Global error handler
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
