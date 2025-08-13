@@ -39,7 +39,13 @@ router.post('/register', async (req, res, next) => {
 
     const token = signToken(user.id);
 
-    return res.status(201).json({ user, token });
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    });
+    return res.status(201).json({ user });
   } catch (err) {
     next(err);
   }
@@ -75,10 +81,25 @@ router.post('/login', async (req, res, next) => {
     // Remove password before returning
     const { password: _pw, ...safeUser } = user as any;
 
-    return res.json({ user: safeUser, token });
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    });
+    return res.json({ user: safeUser });
   } catch (err) {
     next(err);
   }
+});
+
+router.post('/logout', (req, res) => {
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict'
+  });
+  res.json({ message: 'Logged out successfully' });
 });
 
 export default router;
