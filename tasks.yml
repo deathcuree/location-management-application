@@ -1,0 +1,15 @@
+name: Map Location Form Feature
+description: >
+  Implement a feature on the map page that allows users to add and instantly view location markers
+  without page reload, ensuring markers are user-specific.
+
+instructions:
+  - When the form is submitted:
+      - Create a clickable marker at the given latitude/longitude
+      - The marker should display the location name when clicked
+      - The marker should appear instantly on the map without refreshing the page
+  - Ensure location data is scoped per user:
+      - Markers added by User A should only be visible to User A
+      - Markers added by other users should not be visible
+  - All updates should happen dynamically
+  - Maintain proper error handling for invalid inputs (e.g., missing or invalid coordinates)

@@ -28,4 +28,7 @@ declare module 'react-leaflet' {
     children?: ReactNode;
   }
   export const Popup: ComponentType<PopupProps>;
+
+  // Hook: map instance accessor (runtime provided by react-leaflet)
+  export function useMap(): any;
 }
