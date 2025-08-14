@@ -24,7 +24,6 @@ export const useUIStore = create<UIState>((set, get) => ({
   show: (message, type = 'info', durationMs = 3000) => {
     const id = genId();
     set((s) => ({ toasts: [...s.toasts, { id, message, type }] }));
-    // Auto-remove after duration
     if (durationMs > 0) {
       setTimeout(() => {
         const exists = get().toasts.some((t) => t.id === id);
