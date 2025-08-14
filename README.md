@@ -120,3 +120,4 @@ npm run dev
 ## Notes
 - Authentication uses HTTP-only cookies; allow cookies for `localhost`.
 - File upload endpoint expects a `.zip` that contains exactly one `.txt` file with lines in the format: `Name, Latitude, Longitude`.
+- A sample upload archive is provided at the repository root: location.txt.zip
