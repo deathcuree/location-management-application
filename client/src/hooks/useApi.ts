@@ -159,10 +159,6 @@ export function useUploadLocations() {
         url: '/api/upload',
         method: 'POST',
         data: formData,
-        headers: {
-          // Let axios set the correct boundary; providing this is fine with axios
-          'Content-Type': 'multipart/form-data',
-        },
       });
     },
     onSuccess: () => {
