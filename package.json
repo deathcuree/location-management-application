@@ -1,0 +1,20 @@
+{
+  "name": "location-management-application",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "client",
+    "backend"
+  ],
+  "scripts": {
+    "setup": "npm --prefix client install && npm --prefix backend install",
+    "install:client": "npm --prefix client install",
+    "install:backend": "npm --prefix backend install",
+    "prisma:generate": "npm --prefix backend run prisma:generate",
+    "prisma:migrate": "npm --prefix backend run prisma:migrate",
+    "dev": "concurrently -k -n backend,client -c blue,green \"npm --prefix backend run dev\" \"npm --prefix client run dev\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
