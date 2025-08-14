@@ -1,8 +1,41 @@
 import { useEffect, useMemo, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import { useCreateLocation, useLocations } from '../hooks/useApi';
+import L from 'leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { useCreateLocation, useLocations, useDeleteLocation } from '../hooks/useApi';
 import { setupLeafletDefaultIcon } from '../lib/leafletFix';
 import { useUIStore } from '../store/ui';
+
+function MapController({
+  locations,
+  flyTo,
+}: {
+  locations: { lat: number; lng: number }[];
+  flyTo?: { lat: number; lng: number } | null;
+}) {
+  const map = useMap();
+  useEffect(() => {
+    if (locations?.length) {
+      const bounds = L.latLngBounds(locations.map((l) => [l.lat, l.lng] as [number, number]));
+      if (bounds.isValid()) {
+        try {
+          (map as any).fitBounds(bounds, { padding: [40, 40] });
+        } catch {}
+      }
+    }
+  }, [map, locations]);
+  useEffect(() => {
+    if (flyTo) {
+      try {
+        const currentZoom = (map as any).getZoom?.() ?? 12;
+        (map as any).flyTo([flyTo.lat, flyTo.lng], Math.max(currentZoom, 14));
+      } catch {}
+    }
+  }, [map, flyTo]);
+  return null;
+}
+
+// Ensure Leaflet default marker icons are configured BEFORE any Marker mounts
+setupLeafletDefaultIcon();
 
 type FormState = {
   name: string;
@@ -13,13 +46,14 @@ type FormState = {
 export default function MapPage() {
   const { data, isLoading, isError, error } = useLocations();
   const createLocation = useCreateLocation();
+  const deleteLocation = useDeleteLocation();
   const show = useUIStore((s) => s.show);
 
   const [form, setForm] = useState<FormState>({ name: '', lat: '', lng: '' });
+  const [focusTarget, setFocusTarget] = useState<{ lat: number; lng: number } | null>(null);
 
-  useEffect(() => {
-    setupLeafletDefaultIcon();
-  }, []);
+
+
 
   const center = useMemo<[number, number]>(() => {
     const first = data?.locations?.[0];
@@ -55,9 +89,10 @@ export default function MapPage() {
         lng: Number(form.lng),
       },
       {
-        onSuccess: () => {
+        onSuccess: (created) => {
           show('Location added', 'success');
           setForm({ name: '', lat: '', lng: '' });
+          setFocusTarget({ lat: created.lat, lng: created.lng });
         },
         onError: (err: any) => {
           show(err?.message ?? 'Failed to add location', 'error');
@@ -81,6 +116,9 @@ export default function MapPage() {
           <input
             name="lat"
             placeholder="Latitude"
+            type="number"
+            step="any"
+            inputMode="decimal"
             value={form.lat}
             onChange={onChange}
             className="rounded border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500"
@@ -88,6 +126,9 @@ export default function MapPage() {
           <input
             name="lng"
             placeholder="Longitude"
+            type="number"
+            step="any"
+            inputMode="decimal"
             value={form.lng}
             onChange={onChange}
             className="rounded border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500"
@@ -102,9 +143,54 @@ export default function MapPage() {
         </form>
       </section>
 
+      <section className="mt-2 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+        <h2 className="text-lg font-semibold text-slate-900">Your Locations</h2>
+        <div className="mt-3">
+          {isLoading && <div className="text-slate-600">Loading...</div>}
+          {isError && <div className="text-rose-600">Error: {(error as any)?.message ?? 'Failed to load'}</div>}
+          {!isLoading && !isError && (data?.locations?.length ?? 0) === 0 && (
+            <div className="text-slate-600">No locations yet</div>
+          )}
+          {!isLoading && !isError && (data?.locations?.length ?? 0) > 0 && (
+            <ul className="divide-y divide-slate-200 rounded border border-slate-200">
+              {data!.locations.map((loc) => (
+                <li key={loc.id} className="flex items-center justify-between gap-3 p-3 hover:bg-slate-50">
+                  <button
+                    type="button"
+                    onClick={() => setFocusTarget({ lat: loc.lat, lng: loc.lng })}
+                    className="flex-1 text-left"
+                    title="Focus on map"
+                  >
+                    <div className="font-semibold">{loc.name}</div>
+                    <div className="text-xs text-slate-600">
+                      {loc.lat.toFixed(5)}, {loc.lng.toFixed(5)}
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteLocation.mutate(loc.id, {
+                        onSuccess: () => show('Location deleted', 'success'),
+                        onError: (err: any) => show(err?.message ?? 'Failed to delete location', 'error'),
+                      });
+                    }}
+                    disabled={deleteLocation.isPending}
+                    className="rounded border border-rose-200 bg-rose-50 px-3 py-1 text-sm font-medium text-rose-700 hover:bg-rose-100 disabled:opacity-60"
+                  >
+                    Delete
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </section>
+
       <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
         <div className="h-[520px]">
           <MapContainer center={center} zoom={12} style={{ height: '100%', width: '100%' }}>
+            <MapController locations={data?.locations ?? []} flyTo={focusTarget} />
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               attribution="&copy; OpenStreetMap contributors"
