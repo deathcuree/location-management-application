@@ -1,15 +1,13 @@
-name: Map Location Form Feature
-description: >
-  Implement a feature on the map page that allows users to add and instantly view location markers
-  without page reload, ensuring markers are user-specific.
+# name: Map Upload Location Feature
+# description: >
+#   Implement a feature on the upload page that allows users to upload a ZIP file containing location data. Map should also be displayed together with the marker.
 
-instructions:
-  - When the form is submitted:
-      - Create a clickable marker at the given latitude/longitude
-      - The marker should display the location name when clicked
-      - The marker should appear instantly on the map without refreshing the page
-  - Ensure location data is scoped per user:
-      - Markers added by User A should only be visible to User A
-      - Markers added by other users should not be visible
-  - All updates should happen dynamically
-  - Maintain proper error handling for invalid inputs (e.g., missing or invalid coordinates)
+# instructions:
+#   - For the file upload functionality, allow users to upload a single ZIP file that must contain exactly one text file with location data (latitude/longitude coordinates and place names).
+#   - Upon successful upload, display a confirmation popup for 3 seconds, then automatically add all the locations from the file to the user's map.
+#   - If the ZIP file contains anything other than a single text file, show an error popup for 3 secondsinstead.
+#   - Use the following format for the .txt file
+#     Example:
+#     Name, Latitude, Longitude
+#     Suria KLCC,3.157324409,101.7121981
+#     Zoo Negara,3.21054160,101.75920504
