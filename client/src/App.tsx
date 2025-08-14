@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
@@ -14,9 +14,11 @@ function IndexRedirect() {
 }
 
 export default function App() {
+  const location = useLocation();
+  const hideSidebar = location.pathname.startsWith('/login') || location.pathname.startsWith('/register');
   return (
     <div className="flex h-screen w-full bg-slate-50 text-slate-900">
-      <Sidebar />
+      {!hideSidebar && <Sidebar />}
       <main className="flex-1 overflow-auto">
         <div className="mx-auto max-w-6xl p-6">
           <Routes>
