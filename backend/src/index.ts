@@ -7,20 +7,19 @@ import authRoutes from './routes/auth';
 import locationRoutes from './routes/locations';
 import uploadRoutes from './routes/upload';
 
-// Load environment variables
 dotenv.config();
 
 const app = express();
 
 // Middleware
 app.use(cookieParser());
+const allowedOrigins = process.env.CLIENT_URL?.split(',').map((o) => o.trim()).filter(Boolean);
 app.use(cors({
-  origin: process.env.CLIENT_URL,
+  origin: allowedOrigins && allowedOrigins.length > 0 ? allowedOrigins : ['http://localhost:5173'],
   credentials: true
 }));
 app.use(express.json());
 
-// Health check
 app.get('/', (_req, res) => {
   res.json({ status: 'ok', service: 'location-management-backend' });
 });
@@ -39,7 +38,7 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
   });
 });
 
-const PORT = process.env.PORT ? Number(process.env.PORT) : 4000;
+const PORT = Number(process.env.PORT) || 4000;
 app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);
 });

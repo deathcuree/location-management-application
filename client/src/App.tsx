@@ -1,38 +1,51 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Navigate, Route, Routes } from 'react-router-dom';
+import Sidebar from './components/Sidebar';
+import ProtectedRoute from './components/ProtectedRoute';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import MapPage from './pages/MapPage';
+import UploadPage from './pages/UploadPage';
+import Toasts from './components/Toasts';
+import { useAuthStore } from './store/auth';
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1 className="text-3xl font-bold text-blue-600">Vite + React</h1>
-      <div className="mt-4 rounded-lg bg-emerald-100 p-4 text-emerald-800">
-        Tailwind test: this box should be greenish with rounded corners.
-      </div>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+function IndexRedirect() {
+  const isAuthed = useAuthStore((s) => s.isAuthenticated);
+  return <Navigate to={isAuthed ? '/map' : '/login'} replace />;
 }
 
-export default App
+export default function App() {
+  return (
+    <div className="flex h-screen w-full bg-slate-50 text-slate-900">
+      <Sidebar />
+      <main className="flex-1 overflow-auto">
+        <div className="mx-auto max-w-6xl p-6">
+          <Routes>
+            <Route path="/" element={<IndexRedirect />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+
+            <Route
+              path="/map"
+              element={
+                <ProtectedRoute>
+                  <MapPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/upload"
+              element={
+                <ProtectedRoute>
+                  <UploadPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </div>
+      </main>
+      <Toasts />
+    </div>
+  );
+}
