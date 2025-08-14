@@ -6,7 +6,9 @@ import prisma from '../prisma';
 const router = Router();
 
 function signToken(userId: number) {
-  const secret = process.env.JWT_SECRET;
+  const secret =
+    process.env.JWT_SECRET ||
+    (process.env.NODE_ENV !== 'production' ? 'dev_secret_change_me' : undefined);
   if (!secret) {
     throw new Error('JWT_SECRET is not configured');
   }

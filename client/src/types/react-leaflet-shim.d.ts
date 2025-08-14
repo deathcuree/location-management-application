@@ -17,4 +17,15 @@ declare module 'react-leaflet' {
     children?: ReactNode;
   }
   export const TileLayer: ComponentType<TileLayerProps>;
+
+  export interface MarkerProps {
+    position: [number, number];
+    children?: ReactNode;
+  }
+  export const Marker: ComponentType<MarkerProps>;
+
+  export interface PopupProps {
+    children?: ReactNode;
+  }
+  export const Popup: ComponentType<PopupProps>;
 }
