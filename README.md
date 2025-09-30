@@ -25,20 +25,9 @@ createdb location_db
 
 ## 2) Setup: Environment variables
 
-Create backend/.env with:
+Create backend/.env
 
-```env
-DATABASE_URL="postgresql://postgres:092199@localhost:5432/location_db"
-JWT_SECRET="fd7c3d36ba5fc4bb71e53c4b1f58580aef3499dcfa81e7a59a153e19bfb1a75e08da73b77efe50d021a0c26a41c020bb652d38835411be9d29ba1de47dfd16f0"
-CLIENT_URL="http://localhost:5173"
-PORT=4000
-```
-
-Client (client/.env already exists; ensure it points to the backend):
-
-```env
-VITE_API_URL=http://localhost:4000
-```
+Create client/.env
 
 ## 3) Install dependencies
 From the repository root:
